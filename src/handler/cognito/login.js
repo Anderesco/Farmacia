@@ -1,8 +1,9 @@
-const {CognitoIdentity} = require("../libs/cognito")
-const {ApiError} = require("../response/error");
-const {ApiSuccesResponse, ApiInternalErrorResponse} = require("../response/api-response");
-const {Valores} = require("../response/mensajesError");
-const {validacionGrupo, trimUsername} = require("../require/require")
+const {CognitoIdentity} = require("../../libs/cognito")
+const {ApiError} = require("../../response/error");
+const {ApiSuccesResponse, ApiInternalErrorResponse} = require("../../response/api-response");
+const {Valores} = require("../../response/mensajesError");
+const {validacionGrupo, trimUsername} = require("../../require/require");
+const {constantes} = require("../../require/constans");
 
 // ===================================================================//
 /** -----------------------------  LOGIN -----------------------------*/
@@ -12,28 +13,31 @@ exports.token = async message =>{
     console.log(message);
     try {
         if(message.body){
+
             let user = JSON.parse(message.body);
             console.log("[LOGIN] Parámetros: ", user);
 
+            /** validar si coloca un usuario */
             if(user.username === undefined || user.username == "")
                 return  Valores.loginUserNameNotFound;
 
+            /** validar si se coloca una contraseña */
             if(user.password === undefined || user.password == "")
                 return Valores.loginPasswordNotFound;
             
             console.log("[LOGIN] Iniciando login...");    
             usuarioLogueado = await CognitoIdentity.login(trimUsername(user.username), user.password);
 
-            /*console.log("[LOGIN] Usuario pertenece a un grupo : ", await validacionGrupo(trimUsername(user.username)));  
-            if(!await validacionGrupo(trimUsername(user.username)))
+            /** valida si se encuentra en un grupo especifico */
+            var grupoValidado = await validacionGrupo(trimUsername(user.username))
+            console.log("[LOGIN] Usuario pertenece a un grupo : ", grupoValidado);  
+            if(grupoValidado == null)
                 return Valores.loginGroupNotAcepted;
-            
-            console.log("[LOGIN] Obteniendo el grupo del usuario...");
-            let group = await CognitoIdentity.obtenerGrupoPorUsuario(trimUsername(user.username));*/
 
             console.log("[LOGIN] Usuario autenticado correctamente!")
 
-            return new ApiSuccesResponse({code : "0000" , message : "Usuario logueado", data : usuarioLogueado });
+            /** retorna existoso el login */
+            return new ApiSuccesResponse({code : "0000" , message : "Usuario logueado", group: grupoValidado, data : usuarioLogueado });
 
         }
         else

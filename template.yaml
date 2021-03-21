@@ -8,7 +8,7 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 10
     Runtime: nodejs14.x
     CodeUri: src/
 
@@ -36,17 +36,34 @@ Resources:
   LoginFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      Handler: handler/login.token
+      Handler: handler/cognito/login.token
       Environment:
         Variables:
           USER_POOL_ID : !Ref UserPoolID
           CLIENT_POOL : !Ref ClientPoolID
       Events:
-        HelloWorld:
+        Login:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /token
             Method: post
+      Policies:
+        - AmazonCognitoReadOnly
+        - AmazonCognitoPowerUser
+  CambiarContraseniaFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Handler: handler/cognito/contrasenia.cambiarContraseniaPrimeraVez
+      Environment:
+        Variables:
+          USER_POOL_ID : !Ref UserPoolID
+          CLIENT_POOL : !Ref ClientPoolID
+      Events:
+        Login:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /password/update
+            Method: put
       Policies:
         - AmazonCognitoReadOnly
         - AmazonCognitoPowerUser
