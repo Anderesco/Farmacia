@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "sam-app"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1rjv94fzjf3dl"
+s3_prefix = "sam-app"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "UserPoolID=\"us-east-1_MtBddKTvm\" ClientPoolID=\"4s34hq0821fb08c30o4fk5gfp5\""
