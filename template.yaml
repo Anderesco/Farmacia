@@ -42,7 +42,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       FunctionName: 'Farmacia-LoginFunction'
-      Handler: handler/cognito/login.token
+      Handler: handler/login/login.token
       Environment:
         Variables:
           USER_POOL_ID : !Ref UserPoolID
@@ -62,7 +62,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       FunctionName: 'Farmacia-CambiarContraseniaFunction'
-      Handler: handler/cognito/contrasenia.cambiarContraseniaPrimeraVez
+      Handler: handler/login/contrasenia.cambiarContraseniaPrimeraVez
       Environment:
         Variables:
           USER_POOL_ID : !Ref UserPoolID
@@ -120,7 +120,7 @@ Resources:
       Auth :
         Authorizers: 
           MyCognitoAuth :
-            UserPoolArn : "arn:aws:cognito-idp:us-east-1:851006405034:userpool/us-east-1_MtBddKTvm"
+            UserPoolArn : !Sub "arn:aws:cognito-idp:us-east-1:${AWS::AccountId}:userpool/${UserPoolID}"
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
