@@ -26,6 +26,7 @@ Resources:
   PruebaFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
+      FunctionName: 'Farmacia-PruebaFunction'
       Handler: handler/prueba.lambdaHandler
       Events:
         HelloWorld:
@@ -33,9 +34,14 @@ Resources:
           Properties:
             Path: /prueba
             Method: get
+            RestApiId: !Ref AutorizacionFunction
+            Auth :
+              Authorizer : "MyCognitoAuth"
+
   LoginFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
+      FunctionName: 'Farmacia-LoginFunction'
       Handler: handler/cognito/login.token
       Environment:
         Variables:
@@ -47,12 +53,15 @@ Resources:
           Properties:
             Path: /token
             Method: post
+            RestApiId: !Ref AutorizacionFunction
       Policies:
         - AmazonCognitoReadOnly
         - AmazonCognitoPowerUser
+
   CambiarContraseniaFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
+      FunctionName: 'Farmacia-CambiarContraseniaFunction'
       Handler: handler/cognito/contrasenia.cambiarContraseniaPrimeraVez
       Environment:
         Variables:
@@ -64,11 +73,56 @@ Resources:
           Properties:
             Path: /password/update
             Method: put
+            RestApiId: !Ref AutorizacionFunction
       Policies:
         - AmazonCognitoReadOnly
         - AmazonCognitoPowerUser
 
-#Outputs:
+  #Autorizador creado en API Gateway para cognito
+  AutorizacionFunction:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: AutorizacionCognito
+      StageName: dev
+      GatewayResponses:
+        UNAUTHORIZED:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Methods: "'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'"
+              Access-Control-Allow-Headers: "'Origin, X-Requested-With, Content-Type, Accept, Authorization'"
+              Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            "application/json": '{ "message": $context.error.messageString ,"code": "0001" }'
+        EXPIRED_TOKEN:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Methods: "'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'"
+              Access-Control-Allow-Headers: "'Origin, X-Requested-With, Content-Type, Accept, Authorization'"
+              Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            "application/json": '{ "message": $context.error.messageString ,"code": "0002" }'
+        INTEGRATION_TIMEOUT:
+          StatusCode: 504
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Methods: "'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'"
+              Access-Control-Allow-Headers: "'Origin, X-Requested-With, Content-Type, Accept, Authorization'"
+              Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            "application/json": '{ "message": $context.error.messageString ,"code": "0003" }'             
+      Cors:
+        AllowMethods: "'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'"
+        AllowHeaders: "'Origin, X-Requested-With, Content-Type, Accept, Authorization'"
+        AllowOrigin: "'*'"      
+      TracingEnabled: true
+      Auth :
+        Authorizers: 
+          MyCognitoAuth :
+            UserPoolArn : "arn:aws:cognito-idp:us-east-1:851006405034:userpool/us-east-1_MtBddKTvm"
+
+Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
@@ -81,3 +135,14 @@ Resources:
   #HelloWorldFunctionIamRole:
     #Description: "Implicit IAM Role created for Hello World function"
     #Value: !GetAtt HelloWorldFunctionRole.Arn
+  StackName:
+    Description: 'Stack name.'
+    Value: !Sub '${AWS::StackName}'
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub
+      - 'https://${AutorizacionFunction}.execute-api.${AWS::Region}.amazonaws.com/${Stage}'
+      - Stage: dev
+  ApiId:
+    Description: 'Api ID'
+    Value: !Sub '${AutorizacionFunction}'
