@@ -5,7 +5,7 @@ Description: >
 
   Sample SAM Template for sam-cli
   
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+
 Globals:
   Function:
     Timeout: 10
@@ -24,13 +24,13 @@ Parameters:
 
 Resources:
   PruebaFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function 
     Properties:
       FunctionName: 'Farmacia-PruebaFunction'
       Handler: handler/prueba.lambdaHandler
       Events:
         HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api 
           Properties:
             Path: /prueba
             Method: get
@@ -38,8 +38,9 @@ Resources:
             Auth :
               Authorizer : "MyCognitoAuth"
 
+  # Login 
   LoginFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function 
     Properties:
       FunctionName: 'Farmacia-LoginFunction'
       Handler: handler/login/login.token
@@ -49,7 +50,7 @@ Resources:
           CLIENT_POOL : !Ref ClientPoolID
       Events:
         Login:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api 
           Properties:
             Path: /token
             Method: post
@@ -58,8 +59,27 @@ Resources:
         - AmazonCognitoReadOnly
         - AmazonCognitoPowerUser
 
+  StatusFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: 'Farmacia-StatusFunction'
+      Handler: handler/login/login.statusToken
+      Events:
+        Login:
+          Type: Api 
+          Properties:
+            Path: /status
+            Method: get
+            RestApiId: !Ref AutorizacionFunction
+            Auth :
+              Authorizer : "MyCognitoAuth"
+      Policies:
+        - AmazonCognitoReadOnly
+        - AmazonCognitoPowerUser
+  
+  # Contrasenia
   CambiarContraseniaFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function 
     Properties:
       FunctionName: 'Farmacia-CambiarContraseniaFunction'
       Handler: handler/login/contrasenia.cambiarContraseniaPrimeraVez
@@ -69,7 +89,7 @@ Resources:
           CLIENT_POOL : !Ref ClientPoolID
       Events:
         Login:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api  
           Properties:
             Path: /password/update
             Method: put

@@ -80,5 +80,43 @@ class CognitoIdentity {
         });
     }
 
+    /** CREA UN NUEVO USUARIO, COLOCANDO SU NOMBRE, APELLIDO Y CORREO  */
+    static crearUsuario = (username, nombre, familyName, email) => {
+        return new Promise((resolve, reject) => {
+            var params = {
+                UserPoolId: process.env.USER_POOL_ID,
+                Username: username,
+                UserAttributes:[{
+                    Name: "name",
+                    Value: nombre
+                },{
+                    Name: "family_name",
+                    Value: familyName
+                },{
+                    Name: "email",
+                    Value: email
+                },
+                { 
+                    Name: "email_verified",
+                    Value: "true"
+                }
+                ]
+            }
+            
+            console.log(params);
+            
+            cognitoUser.adminCreateUser(params, function(err, data) {
+                if (err) {
+                    console.log("[Cognito:CognitoIdentity] crearUsuario : adminCreateUser error ", err); 
+                    reject(err);
+                }else{
+                    console.log("[Cognito:CognitoIdentity] crearUsuario : adminCreateUser terminado", data); 
+                    resolve(data);
+                }           
+            });
+        });
+    }
+
+
 }
 module.exports.CognitoIdentity = CognitoIdentity;
