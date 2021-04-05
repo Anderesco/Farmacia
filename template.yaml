@@ -16,11 +16,15 @@ Parameters:
   UserPoolID:
     Type: String
     Description: "User pool ID del cognito"
-    Default: "us-east-1_MtBddKTvm"
+    Default: "us-east-1_p0IsAx0en"
   ClientPoolID:
     Type: String
     Description: "Client pool ID del cognito"
-    Default: "4s34hq0821fb08c30o4fk5gfp5"
+    Default: "6sjgs64org40ocak6j4e2tsmno"
+  TableUser:
+    Type: String
+    Description : "Tabla usuario en Dynamo, donde se ecnuentran los usuarios"
+    Default : "FARMACIA-USUARIOS"
 
 Resources:
   PruebaFunction:
@@ -48,6 +52,7 @@ Resources:
         Variables:
           USER_POOL_ID : !Ref UserPoolID
           CLIENT_POOL : !Ref ClientPoolID
+          TABLE_USER : !Ref TableUser
       Events:
         Login:
           Type: Api 
@@ -93,6 +98,23 @@ Resources:
           Properties:
             Path: /password/update
             Method: put
+            RestApiId: !Ref AutorizacionFunction
+      Policies:
+        - AmazonCognitoReadOnly
+        - AmazonCognitoPowerUser
+  
+  # Usario
+  MeFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: 'Farmacia-Me'
+      Handler: handler/login/usuarios.me
+      Events:
+        Login:
+          Type: Api  
+          Properties:
+            Path: /me
+            Method: get
             RestApiId: !Ref AutorizacionFunction
       Policies:
         - AmazonCognitoReadOnly

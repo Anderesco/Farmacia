@@ -33,5 +33,37 @@ async function validacionGrupo (username) {
 }
 
 
+/** Obtener datos desde un token */
+function obtenerUsuarioPorToken(message){
+    var authHeader = message.headers['Authorization'];
+
+    let usuario = (authHeader.split(' ')[1].toString()).split('.')[1];
+    console.log("[TOKEN] Token: ", authHeader);
+
+    const buff = Buffer.from(usuario, 'base64');
+    const str = buff.toString('utf-8');
+
+    console.log("[JSON] Usuario: ", str);
+    let atributosUsuario = JSON.parse(str)
+
+    return attributosusuarioToken(atributosUsuario);
+}
+
+function attributosusuarioToken(atributosUsuario){
+    return {
+        id : parseInt(atributosUsuario['custom:id']),
+        dni : atributosUsuario['custom:dni'],
+        nombres : atributosUsuario.name,
+        apellidos : atributosUsuario.family_name,
+        correo : atributosUsuario.email,
+        telefono : atributosUsuario.phone_number,
+        sueldo : Number(atributosUsuario['custom:sueldo']),
+        rol : atributosUsuario['cognito:groups'][0],
+        username : atributosUsuario['cognito:username']
+    }
+}
+
+
 module.exports.trimUsername = trimUsername;
 module.exports.validacionGrupo = validacionGrupo;
+module.exports.obtenerUsuarioPorToken = obtenerUsuarioPorToken;

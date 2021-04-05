@@ -1,4 +1,5 @@
-const {CognitoIdentity} = require("../../libs/cognito")
+const {CognitoIdentity} = require("../../libs/cognito");
+const {DynamoUserIdentity} = require("../../libs/sql/dynamo-user");
 const {ApiError} = require("../../response/error");
 const {ApiSuccesResponse, ApiInternalErrorResponse} = require("../../response/api-response");
 const {Valores} = require("../../response/mensajesError");
@@ -35,6 +36,10 @@ exports.token = async message =>{
                 return Valores.loginGroupNotAcepted;
 
             console.log("[LOGIN] Usuario autenticado correctamente!")
+            /** validar en Dynamo si existe el usuario */
+            /*let usuarioDynamo = await DynamoUserIdentity.getUsuario(user.username, grupoValidado);
+            if(usuarioDynamo == null)
+                return Valores.loginGroupNotAcepted;*/
 
             /** retorna existoso el login */
             return new ApiSuccesResponse({code : "0000" , message : "Usuario logueado", group: grupoValidado, data : usuarioLogueado });
