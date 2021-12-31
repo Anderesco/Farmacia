@@ -49,6 +49,7 @@ function obtenerUsuarioPorToken(message){
     return attributosusuarioToken(atributosUsuario);
 }
 
+/** Atributos de un usuario */
 function attributosusuarioToken(atributosUsuario){
     return {
         id : parseInt(atributosUsuario['custom:id']),
@@ -63,7 +64,16 @@ function attributosusuarioToken(atributosUsuario){
     }
 }
 
+/** Validar rol de un usuario */
+function validarGrupo (grupo) {
+    if(constantes.grupos.includes(grupo.toUpperCase()))
+        return true;
+    
+    return false;
+}
+
 
 module.exports.trimUsername = trimUsername;
 module.exports.validacionGrupo = validacionGrupo;
 module.exports.obtenerUsuarioPorToken = obtenerUsuarioPorToken;
+module.exports.validarGrupo = validarGrupo;

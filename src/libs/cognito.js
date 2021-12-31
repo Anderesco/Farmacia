@@ -81,24 +81,40 @@ class CognitoIdentity {
     }
 
     /** CREA UN NUEVO USUARIO, COLOCANDO SU NOMBRE, APELLIDO Y CORREO  */
-    static crearUsuario = (username, nombre, familyName, email) => {
+    static crearUsuario = (user, id) => {
         return new Promise((resolve, reject) => {
             var params = {
                 UserPoolId: process.env.USER_POOL_ID,
-                Username: username,
+                Username: user.username,
                 UserAttributes:[{
                     Name: "name",
-                    Value: nombre
+                    Value: user.nombre
                 },{
                     Name: "family_name",
-                    Value: familyName
+                    Value: user.apellidoPaterno + user.apellidoMaterno
                 },{
                     Name: "email",
-                    Value: email
+                    Value: user.correo
                 },
                 { 
                     Name: "email_verified",
                     Value: "true"
+                },
+                {
+                    Name: "phone_number",
+                    Value: user.telefono
+                },
+                {
+                    Name: "custom:sueldo",
+                    Value: user.sueldo
+                },
+                { 
+                    Name: "custom:dni",
+                    Value: user.dni
+                },
+                {
+                    Name: "custom:id",
+                    Value: id
                 }
                 ]
             }

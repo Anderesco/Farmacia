@@ -119,6 +119,21 @@ Resources:
       Policies:
         - AmazonCognitoReadOnly
         - AmazonCognitoPowerUser
+  CrearUsuarioFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: 'Farmacia-CrearUsuario'
+      Handler: handler/login/usuarios.crearUsuario
+      Events:
+        Login:
+          Type: Api  
+          Properties:
+            Path: /user/create
+            Method: get
+            RestApiId: !Ref AutorizacionFunction
+      Policies:
+        - AmazonCognitoReadOnly
+        - AmazonCognitoPowerUser
 
   #Autorizador creado en API Gateway para cognito
   AutorizacionFunction:

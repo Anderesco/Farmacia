@@ -36,10 +36,6 @@ exports.token = async message =>{
                 return Valores.loginGroupNotAcepted;
 
             console.log("[LOGIN] Usuario autenticado correctamente!")
-            /** validar en Dynamo si existe el usuario */
-            /*let usuarioDynamo = await DynamoUserIdentity.getUsuario(user.username, grupoValidado);
-            if(usuarioDynamo == null)
-                return Valores.loginGroupNotAcepted;*/
 
             /** retorna existoso el login */
             return new ApiSuccesResponse({code : "0000" , message : "Usuario logueado", group: grupoValidado, data : usuarioLogueado });

@@ -4,7 +4,7 @@ version = 0.1
 [default.deploy.parameters]
 stack_name = "WEB-FARMACIA"
 s3_bucket = "farmacia.ventas"
-s3_prefix = "WEB-FARMACIA"
+s3_prefix = "WEB-FARMACIA/v1"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
