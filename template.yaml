@@ -16,11 +16,11 @@ Parameters:
   UserPoolID:
     Type: String
     Description: "User pool ID del cognito"
-    Default: "us-east-1_p0IsAx0en"
+    Default: "us-east-1_BjPuLlp8T"
   ClientPoolID:
     Type: String
     Description: "Client pool ID del cognito"
-    Default: "6sjgs64org40ocak6j4e2tsmno"
+    Default: "7k0knf5jdl6cc185irnr00rusn"
   TableUser:
     Type: String
     Description : "Tabla usuario en Dynamo, donde se ecnuentran los usuarios"
@@ -102,6 +102,26 @@ Resources:
       Policies:
         - AmazonCognitoReadOnly
         - AmazonCognitoPowerUser
+  CambiarContraseniaAdminFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: 'Farmacia-CambiarContraseniaAdminFunction'
+      Handler: handler/login/contrasenia.cambiarContraseniaAdmin
+      Environment:
+        Variables:
+          USER_POOL_ID : !Ref UserPoolID
+      Events:
+        Login:
+          Type: Api  
+          Properties:
+            Path: /password
+            Method: put
+            RestApiId: !Ref AutorizacionFunction
+            Auth :
+              Authorizer : "MyCognitoAuth"
+      Policies:
+        - AmazonCognitoReadOnly
+        - AmazonCognitoPowerUser
   
   # Usario
   MeFunction:
@@ -116,6 +136,8 @@ Resources:
             Path: /me
             Method: get
             RestApiId: !Ref AutorizacionFunction
+            Auth :
+              Authorizer : "MyCognitoAuth"
       Policies:
         - AmazonCognitoReadOnly
         - AmazonCognitoPowerUser
@@ -124,13 +146,18 @@ Resources:
     Properties:
       FunctionName: 'Farmacia-CrearUsuario'
       Handler: handler/login/usuarios.crearUsuario
+      Environment:
+        Variables:
+          USER_POOL_ID : !Ref UserPoolID
       Events:
         Login:
           Type: Api  
           Properties:
             Path: /user/create
-            Method: get
+            Method: post
             RestApiId: !Ref AutorizacionFunction
+            Auth :
+              Authorizer : "MyCognitoAuth"
       Policies:
         - AmazonCognitoReadOnly
         - AmazonCognitoPowerUser

@@ -1,6 +1,6 @@
 const constantes = 
 {
-    grupos : ['ADMINISTRADOR', 'VENDEDOR'],
+    grupos : ['ADMINISTRADOR', 'SUPERVISOR', 'ALMACEN', 'CAJERO'],
     usuarios :{
         administrador : 'A',
         vendedor : 'V',

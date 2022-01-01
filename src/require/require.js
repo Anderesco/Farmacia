@@ -52,24 +52,18 @@ function obtenerUsuarioPorToken(message){
 /** Atributos de un usuario */
 function attributosusuarioToken(atributosUsuario){
     return {
-        id : parseInt(atributosUsuario['custom:id']),
-        dni : atributosUsuario['custom:dni'],
         nombres : atributosUsuario.name,
         apellidos : atributosUsuario.family_name,
         correo : atributosUsuario.email,
         telefono : atributosUsuario.phone_number,
-        sueldo : Number(atributosUsuario['custom:sueldo']),
         rol : atributosUsuario['cognito:groups'][0],
-        username : atributosUsuario['cognito:username']
+        dni: atributosUsuario['custom:dni']
     }
 }
 
 /** Validar rol de un usuario */
 function validarGrupo (grupo) {
-    if(constantes.grupos.includes(grupo.toUpperCase()))
-        return true;
-    
-    return false;
+    return constantes.grupos.includes(grupo.toUpperCase())
 }
 
 

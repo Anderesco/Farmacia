@@ -81,10 +81,11 @@ class CognitoIdentity {
     }
 
     /** CREA UN NUEVO USUARIO, COLOCANDO SU NOMBRE, APELLIDO Y CORREO  */
-    static crearUsuario = (user, id) => {
+    static crearUsuario = (user) => {
         return new Promise((resolve, reject) => {
             var params = {
                 UserPoolId: process.env.USER_POOL_ID,
+                DesiredDeliveryMediums: ["EMAIL"],
                 Username: user.username,
                 UserAttributes:[{
                     Name: "name",
@@ -98,28 +99,18 @@ class CognitoIdentity {
                 },
                 { 
                     Name: "email_verified",
-                    Value: "true"
+                    Value: "false"
                 },
                 {
                     Name: "phone_number",
                     Value: user.telefono
                 },
                 {
-                    Name: "custom:sueldo",
-                    Value: user.sueldo
-                },
-                { 
                     Name: "custom:dni",
                     Value: user.dni
-                },
-                {
-                    Name: "custom:id",
-                    Value: id
                 }
                 ]
             }
-            
-            console.log(params);
             
             cognitoUser.adminCreateUser(params, function(err, data) {
                 if (err) {
@@ -131,6 +122,49 @@ class CognitoIdentity {
                 }           
             });
         });
+    }
+
+    /** Agregar usuario a un grupo */
+    static agregarGrupoUsuario(group, username){
+        return new Promise((resolve, reject) => {
+            var params = {
+                GroupName: group, 
+                UserPoolId: process.env.USER_POOL_ID, 
+                Username: username 
+            };
+
+            cognitoUser.adminAddUserToGroup(params, function(err, data) {
+                if (err) {
+                    console.log("[Cognito:CognitoIdentity] agregarGrupoUsuario : adminAddUserToGroup error ", err); 
+                    reject(err);
+                } else {
+                    console.log("[Cognito:CognitoIdentity] agregarGrupoUsuario : adminAddUserToGroup terminado", data); 
+                    resolve(data);
+                }           
+            });
+        })
+    }
+
+    /** Agregar contraseña nivel administrador */
+    static colocarActualizarContraseña(password, username){
+        return new Promise((resolve, reject) => {
+            var params = {
+                Password: password,
+                UserPoolId: process.env.USER_POOL_ID,
+                Username: username, 
+                Permanent: true 
+            };
+
+            cognitoUser.adminSetUserPassword(params, function(err, data) {
+                if (err) {
+                    console.log("[Cognito:CognitoIdentity] colocarActualizarContraseña : adminSetUserPassword error ", err); 
+                    reject(err);
+                } else {
+                    console.log("[Cognito:CognitoIdentity] colocarActualizarContraseña : adminSetUserPassword terminado", data); 
+                    resolve(data);
+                }           
+            });
+        })
     }
 
 

@@ -1,6 +1,8 @@
-const {obtenerUsuarioPorToken} = require('../../require/require');
-const {ApiSuccesResponse, ApiInternalErrorResponse} = require('../../response/api-response');
+const {obtenerUsuarioPorToken, validarGrupo} = require('../../require/require');
+const {CognitoIdentity} = require("../../libs/cognito");
+const {ApiSuccesResponse, ApiInternalErrorResponse, ApiBadRequestResponse} = require('../../response/api-response');
 const { Valores } = require('../../response/mensajesError');
+const {ApiError} = require('../../response/error');
 
 // ===================================================================//
 /** ----------------  OBTENER DATOS USUARIOS SESION ------------------*/
@@ -42,25 +44,37 @@ exports.crearUsuario = async message =>{
         if(user.telefono === undefined || user.telefono == "")
             return Valores.createUserNotFoundTelefono;
         
-        if(user.telefono.length != 9 || (Number(user.telefono)).length != 9)
-            return Valores.createUserFormatTelefono;
-        
         if(user.tipousuario === undefined || user.tipousuario == "")
             return Valores.createUserNotFoundRol;
-        
-        if(user.sueldo === undefined || user.sueldo == 0)
-            return Valores.createUserNotFoundSueldo;
-        
-        if(user.dni === undefined || user.dni == 0)
+
+        if(user.dni === undefined || user.dni.dni == "")
             return Valores.createUserNotFoundDNI;
-        
+
+        console.log("[CREAR USUARIO] Verificando grupo existente ", user.tipousuario);
+        if(!validarGrupo(user.tipousuario))
+            return Valores.createUserGroupNoExisting;
+
         console.log("[CREAR USUARIO] Procediendo a crear el usuario : ", user.username);
+        await CognitoIdentity.crearUsuario(user);
+
+        console.log("[CREAR USUARIO] Agregando al grupo ", user.tipousuario, 
+                    " al usuario : ", user.username);
+        await CognitoIdentity.agregarGrupoUsuario(user.tipousuario,user.username);
+
+        return new ApiSuccesResponse({code : "0000" , 
+                                      message : "Usuario creado, proceda a colocar una contraseña"});
         
     }
     catch(error){
         console.log("Ocurrió un error", error);
-        return new ApiInternalErrorResponse(new ApiError("Error inesperado: " + error));
+
+        switch(error.code){
+            case "UsernameExistsException":
+                return Valores.createUserUserNameExist;
+
+            default:
+                return new ApiInternalErrorResponse(new ApiError("Error inesperado: " + error));
+        }
     }  
 }
-
 

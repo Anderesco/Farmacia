@@ -8,4 +8,4 @@ s3_prefix = "WEB-FARMACIA/v1"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "UserPoolID=\"us-east-1_MtBddKTvm\" ClientPoolID=\"4s34hq0821fb08c30o4fk5gfp5\""
+parameter_overrides = "UserPoolID=\"us-east-1_6jVt6odpf\" ClientPoolID=\"6lnpq4ksu7pfiuhda5jekgt8mt\""

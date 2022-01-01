@@ -56,3 +56,25 @@ exports.cambiarContraseniaPrimeraVez = async message => {
         }
     }
 }
+
+// ===================================================================//
+/** --------------------  CAMBIAR CONTRASEÑA ADMIN -------------------*/
+// ===================================================================//
+exports.cambiarContraseniaAdmin = async message => {
+    let user = JSON.parse(message.body);
+
+    try {
+        console.log("[Cambiar/Colocar Contraseña] Actualizando usuario ", user.username);
+        await CognitoIdentity.colocarActualizarContraseña(user.password,user.username);
+
+        return new ApiSuccesResponse({code : "0000" , 
+                                      message : "Usuario modificado, contraseña establecida"});
+    }
+    catch(error) {
+        console.log("Ocurrió un error", error);
+        switch(error.code){
+            default:
+                return new ApiInternalErrorResponse(new ApiError("Error inesperado: " + error));
+        }
+    }
+}
