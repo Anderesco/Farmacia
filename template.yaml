@@ -161,6 +161,26 @@ Resources:
       Policies:
         - AmazonCognitoReadOnly
         - AmazonCognitoPowerUser
+  ListaUsuariosFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: 'Farmacia-ListarUsuarios'
+      Handler: handler/login/usuarios.obtenerUsuarios
+      Environment:
+        Variables:
+          USER_POOL_ID : !Ref UserPoolID
+      Events:
+        ListUsersEvent:
+          Type: Api  
+          Properties:
+            Path: /user
+            Method: get
+            RestApiId: !Ref AutorizacionFunction
+            Auth :
+              Authorizer : "MyCognitoAuth"
+      Policies:
+        - AmazonCognitoReadOnly
+        - AmazonCognitoPowerUser
 
   #Autorizador creado en API Gateway para cognito
   AutorizacionFunction:

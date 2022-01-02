@@ -78,3 +78,40 @@ exports.crearUsuario = async message =>{
     }  
 }
 
+// ===================================================================//
+/** ----------------------  OBTENER USUARIOS -------------------------*/
+// ===================================================================//
+exports.obtenerUsuarios = async message =>{
+    try {
+        console.log("[OBTENER USUARIOS] Obteniendo usuarios");
+        let users = await CognitoIdentity.obtenerUsuarios();
+        let listUsers = [];
+
+        users.Users.forEach(user => listUsers.push(jsonUser(user)));
+
+        return new ApiSuccesResponse({code : "0000" , 
+                                      message : "Se obtienen los usuarios.",
+                                      data: listUsers});
+
+    } catch (error) {
+        console.log("Ocurrió un error", error);
+
+        switch(error.code){
+            default:
+                return new ApiInternalErrorResponse(new ApiError("Error inesperado: " + error));
+        }
+    }
+}
+
+function jsonUser(user) {
+
+    return {
+        username: user.Username,
+        nombre : user.Attributes.filter(u => u.Name == "name")[0].Value,
+        apellidos : user.Attributes.filter(u => u.Name == "family_name")[0].Value,
+        telefono : user.Attributes.filter(u => u.Name == "phone_number")[0].Value,
+        dni : user.Attributes.filter(u => u.Name == "custom:dni")[0].Value,
+        email : user.Attributes.filter(u => u.Name == "email")[0].Value,
+        estado : user.UserStatus
+    }
+}

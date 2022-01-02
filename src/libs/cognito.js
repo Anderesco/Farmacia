@@ -167,6 +167,28 @@ class CognitoIdentity {
         })
     }
 
+    /** OBTENER TODOS LOS USUARIOS REGISTRADOS EN EL USER POOL DE COGNITO, PRESENTE O NO UN GRUPO */
+    static obtenerUsuarios() {
+        return new Promise((resolve, reject) => {
+            var params = {
+                UserPoolId: process.env.USER_POOL_ID
+            };
+    
+            cognitoUser.listUsers(params
+            , function(err, data) {
+                if (err) {
+                    console.log("[Cognito:CognitoIdentity] obtenerUsuarios: listUsers error ", err);
+                    reject(err);
+                    
+                }
+                else{
+                    console.log("[Cognito:CognitoIdentity] obtenerUsuarios: listUsers terminado ", data);
+                    resolve(data);
+                }
+            }
+            );
+        });
+    }
 
 }
 module.exports.CognitoIdentity = CognitoIdentity;
